@@ -12,6 +12,7 @@ spec:
       labels:
         app: kafka-load-generator
     spec:
+      restartPolicy: Never
       containers:
         - name: kafka-load-generator
           # TODO: Newer image
