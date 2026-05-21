@@ -1,10 +1,9 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: kafka-load-generator
   namespace: kafka
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: kafka-load-generator
@@ -36,7 +35,7 @@ spec:
 
             # total messages
             - name: NUM_RECORDS
-              value: "10000000"
+              value: "1000"
 
           command:
             - /bin/bash
