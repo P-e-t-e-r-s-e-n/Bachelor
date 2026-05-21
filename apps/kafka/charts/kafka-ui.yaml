@@ -16,8 +16,8 @@ spec:
         yamlApplicationConfig:
           kafka:
             clusters:
-              - name: yaml
-                bootstrapServers: kafka-cluster-kafka-bootstrap.kafka.svc:9092
+              - name: stu245087-kafka-ui
+                bootstrapServers: stu245087-kafka-cluster-kafka-bootstrap.kafka.svc:9092
           auth:
             type: disabled
           management:
