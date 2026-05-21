@@ -4,9 +4,6 @@ metadata:
   name: kafka-load-generator
   namespace: kafka
 spec:
-  selector:
-    matchLabels:
-      app: kafka-load-generator
   template:
     metadata:
       labels:
