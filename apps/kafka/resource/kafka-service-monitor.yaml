@@ -4,7 +4,7 @@ metadata:
   name: kafka-pod-monitor
   namespace: monitoring
   labels:
-    release: prometheus
+    release: stu245087-prometheus-minimal
 spec:
   selector:
     matchLabels:
