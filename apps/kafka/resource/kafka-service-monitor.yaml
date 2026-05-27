@@ -10,7 +10,7 @@ spec:
     matchLabels:
       strimzi.io/cluster: stu245087-kafka-cluster
       strimzi.io/kind: Kafka
-      strimzi.io/name: kafka-cluster-kafka-exporter
+      strimzi.io/name: stu245087-kafka-cluster-kafka-exporter
   namespaceSelector:
     matchNames:
       - kafka
