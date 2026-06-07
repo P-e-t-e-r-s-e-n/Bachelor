@@ -12,8 +12,8 @@ spec:
       restartPolicy: Never
       containers:
         - name: kafka-load-generator
-          # TODO: Newer image
-          image: apache/kafka:3.9.1
+          #old one: apache/kafka:3.9.1
+          image: apache/kafka:4.3.0
           imagePullPolicy: IfNotPresent
 
           env:
