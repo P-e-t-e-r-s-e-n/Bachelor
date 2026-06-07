@@ -18,6 +18,8 @@ spec:
           imagePullPolicy: IfNotPresent
 
           env:
+            - name: SCENARIO
+              value: "stress"
             - name: BROKER
               value: "stu245087-kafka-cluster-kafka-bootstrap.kafka.svc:9092"
 
