@@ -34,7 +34,7 @@ data:
       do
         echo "Current throughput: $RATE msg/s"
 
-        kafka-producer-perf-test.sh \
+    /opt/kafka/bin/kafka-producer-perf-test.sh \ \
           --topic "${TOPIC}" \
           --num-records 10000000 \
           --throughput "${RATE}" \
@@ -57,7 +57,7 @@ data:
     ########################################
     # ELSE: DEFAULT 
     ########################################
-    kafka-producer-perf-test.sh \
+    /opt/kafka/bin/kafka-producer-perf-test.sh \ \
       --topic "${TOPIC}" \
       --num-records "${NUM_RECORDS}" \
       --throughput "${THROUGHPUT}" \
