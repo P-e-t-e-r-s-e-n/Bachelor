@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: kafka-load-generator
+  name: kafka-load-spike-generator
   namespace: kafka
 spec:
   activeDeadlineSeconds: 60
