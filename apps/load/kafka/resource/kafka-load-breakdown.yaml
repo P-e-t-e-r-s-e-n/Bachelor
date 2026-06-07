@@ -4,7 +4,6 @@ metadata:
   name: kafka-load-breakdown-generator
   namespace: kafka
 spec:
-  activeDeadlineSeconds: 180
   template:
     metadata:
       labels:
