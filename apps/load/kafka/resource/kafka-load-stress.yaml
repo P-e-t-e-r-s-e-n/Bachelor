@@ -4,7 +4,7 @@ metadata:
   name: kafka-load-stress-generator
   namespace: kafka
 spec:
-  activeDeadlineSeconds: 60
+  activeDeadlineSeconds: 180
   template:
     metadata:
       labels:
