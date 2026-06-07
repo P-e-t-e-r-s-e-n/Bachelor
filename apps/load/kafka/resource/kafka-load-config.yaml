@@ -3,21 +3,61 @@ kind: ConfigMap
 metadata:
   name: kafka-load-script
   namespace: kafka
+
 data:
   producer.sh: |
     #!/bin/bash
+    set -e
 
     TOPIC="${TOPIC:-load-test-topic}"
     BROKER="${BROKER:-kafka-cluster-kafka-bootstrap:9092}"
+    SCENARIO="${SCENARIO:-normal}"
+
     THROUGHPUT="${THROUGHPUT:--1}"
     RECORD_SIZE="${RECORD_SIZE:-1024}"
     NUM_RECORDS="${NUM_RECORDS:-10000000}"
 
     echo "Starting Kafka load test"
+    echo "Scenario: ${SCENARIO}"
     echo "Broker: ${BROKER}"
     echo "Topic: ${TOPIC}"
 
-    /opt/kafka/bin/kafka-producer-perf-test.sh \
+    ########################################
+    # BREAKDOWN SCENARIO
+    ########################################
+    if [ "$SCENARIO" = "breakdown" ]; then
+      echo "Running BREAKDOWN scenario"
+
+      RATE=1000
+
+      while true
+      do
+        echo "Current throughput: $RATE msg/s"
+
+        kafka-producer-perf-test.sh \
+          --topic "${TOPIC}" \
+          --num-records 10000000 \
+          --throughput "${RATE}" \
+          --record-size "${RECORD_SIZE}" \
+          --producer-props acks=1 bootstrap.servers="${BROKER}" &
+
+        sleep 10
+
+        RATE=$((RATE * 2))
+
+        if [ "$RATE" -gt 64000 ]; then
+          echo "Max rate reached, stopping breakdown"
+          break
+        fi
+      done
+
+      exit 0
+    fi
+
+    ########################################
+    # ELSE: DEFAULT 
+    ########################################
+    kafka-producer-perf-test.sh \
       --topic "${TOPIC}" \
       --num-records "${NUM_RECORDS}" \
       --throughput "${THROUGHPUT}" \

@@ -1,9 +1,12 @@
+kafka-load-base:
+  yaml:
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: kafka-load-generator
   namespace: kafka
 spec:
+  activeDeadlineSeconds: 60
   template:
     metadata:
       labels:
@@ -33,7 +36,7 @@ spec:
 
             # total messages
             - name: NUM_RECORDS
-              value: "1000"
+              value: "500000"
 
           command:
             - /bin/bash

@@ -1,0 +1,59 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-load-generator
+  namespace: kafka
+spec:
+  activeDeadlineSeconds: 60
+  template:
+    metadata:
+      labels:
+        app: kafka-load-generator
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: kafka-load-generator
+          #old one: apache/kafka:3.9.1
+          image: apache/kafka:4.3.0
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: BROKER
+              value: "stu245087-kafka-cluster-kafka-bootstrap.kafka.svc:9092"
+
+            - name: TOPIC
+              value: "load-test-topic"
+
+            # -1 = unlimited throughput
+            - name: THROUGHPUT
+              value: "1000"
+
+            # bytes per message
+            - name: RECORD_SIZE
+              value: "1024"
+
+            # total messages
+            - name: NUM_RECORDS
+              value: "60000"
+
+          command:
+            - /bin/bash
+            - /scripts/producer.sh
+
+          volumeMounts:
+            - name: load-script
+              mountPath: /scripts
+
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+
+      volumes:
+        - name: load-script
+          configMap:
+            name: kafka-load-script
+            defaultMode: 0755
