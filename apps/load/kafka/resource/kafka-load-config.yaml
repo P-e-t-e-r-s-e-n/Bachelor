@@ -23,42 +23,40 @@ data:
     echo "Topic: ${TOPIC}"
 
     ########################################
-    # BREAKDOWN SCENARIO
+    # BREAKDOWN SCENARIO (SEQUENTIAL RAMP)
     ########################################
     if [ "$SCENARIO" = "breakdown" ]; then
-    echo "Running BREAKDOWN scenario (continuous ramp)"
-  
-    RATE=1000
-    STEP=200
-    INTERVAL=10   # seconds per measurement window
-  
-    while [ "$RATE" -le 64000 ]
-    do
-      echo "Current target rate: $RATE msg/s"
-  
-      /opt/kafka/bin/kafka-producer-perf-test.sh \
-        --topic "${TOPIC}" \
-        --num-records 100000000 \
-        --throughput "${RATE}" \
-        --record-size "${RECORD_SIZE}" \
-        --producer-props acks=1 bootstrap.servers="${BROKER}" \
-        > /tmp/breakdown.log 2>&1 &
-  
-      PID=$!
-  
-      sleep $INTERVAL
-  
-      kill $PID 2>/dev/null || true
-  
-      # smooth ramp (wichtig für "kontinuierlich")
-      RATE=$((RATE * 110 / 100))  # +10% every step
-  
-      # optional: steiler machen wenn du schneller crash willst
-      # STEP=$((STEP + 100))
-    done
-  
-    echo "Breakdown finished"
-    exit 0
+      echo "Running BREAKDOWN scenario (sequential ramp)"
+    
+      RATE=1000
+      MAX_RATE=64000
+      MULTIPLIER=1.25   # exponentiell (1.2–1.5 ist ideal)
+      DURATION=20       # seconds per step
+    
+      while (( $(echo "$RATE <= $MAX_RATE" | bc -l) ))
+      do
+        echo "========================================"
+        echo "Running step with RATE=$RATE msg/s"
+        echo "Duration: ${DURATION}s"
+        echo "========================================"
+    
+        /opt/kafka/bin/kafka-producer-perf-test.sh \
+          --topic "${TOPIC}" \
+          --num-records 100000000 \
+          --throughput "${RATE}" \
+          --record-size "${RECORD_SIZE}" \
+          --producer-props acks=1 bootstrap.servers="${BROKER}"
+    
+        echo "Finished step RATE=$RATE"
+        echo ""
+    
+        # exponentieller Anstieg
+        RATE=$(echo "$RATE * $MULTIPLIER" | bc -l)
+        RATE=${RATE%.*}
+      done
+    
+      echo "Breakdown finished"
+      exit 0
     fi
 
     ########################################
