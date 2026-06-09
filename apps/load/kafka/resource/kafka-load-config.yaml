@@ -23,37 +23,35 @@ data:
     echo "Topic: ${TOPIC}"
 
     ########################################
-    # BREAKDOWN SCENARIO (ONE PRODUCER)
+    # BREAKDOWN SCENARIO (Optimiert)
     ########################################
     if [ "$SCENARIO" = "breakdown" ]; then
-      echo "Running BREAKDOWN scenario (single producer, restart each step)"
-    
-      RATE=1000
-      MAX_RATE=64000
-      STEP_TIME=20
-    
-      while [ "$RATE" -le "$MAX_RATE" ]
-      do
-        echo "========================================"
-        echo "Starting run with RATE=$RATE msg/s for ${STEP_TIME}s"
-        echo "========================================"
-    
-        timeout ${STEP_TIME} \
-        /opt/kafka/bin/kafka-producer-perf-test.sh \
-          --topic "${TOPIC}" \
-          --num-records 100000000 \
-          --throughput "${RATE}" \
-          --record-size "${RECORD_SIZE}" \
-          --producer-props acks=1 bootstrap.servers="${BROKER}"
-    
-        echo "Finished run RATE=$RATE"
-        echo "----------------------------------------"
-    
-        RATE=$((RATE * 2))
-      done
-    
-      echo "Breakdown finished"
-      exit 0
+        echo "Running BREAKDOWN scenario"
+        RATE=1000
+        
+        while true
+        do
+            echo "Current throughput: $RATE msg/s"
+            
+            # WICHTIG: KEIN '&' am Ende. --duration sorgt für die Laufzeit.
+            /opt/kafka/bin/kafka-producer-perf-test.sh \
+              --topic "${TOPIC}" \
+              --duration 40 \
+              --throughput "${RATE}" \
+              --record-size "${RECORD_SIZE}" \
+              --command-config /dev/null \
+              --producer-props acks=1 bootstrap.servers="${BROKER}"
+              
+            # Ein kurzes Verschnaufen für den Cluster vor der nächsten Stufe
+            sleep 5 
+            
+            RATE=$((RATE * 2))
+            if [ "$RATE" -gt 64000 ]; then
+                echo "Max rate reached, stopping breakdown"
+                break
+            fi
+        done
+        exit 0
     fi
 
     ########################################
