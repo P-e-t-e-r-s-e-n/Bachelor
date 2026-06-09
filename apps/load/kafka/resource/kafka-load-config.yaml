@@ -59,7 +59,7 @@ data:
   
     echo "Breakdown finished"
     exit 0
-  fi
+    fi
 
     ########################################
     # ELSE: DEFAULT 
