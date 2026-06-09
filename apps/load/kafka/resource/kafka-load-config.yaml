@@ -30,29 +30,20 @@ data:
 
       RATE=1000
 
-      while true
-      do
-        echo "Current throughput: $RATE msg/s"
-
-    /opt/kafka/bin/kafka-producer-perf-test.sh \
+    while [ "$RATE" -le 64000 ]
+    do
+      echo "Rate=$RATE"
+    
+      timeout 10 \
+      /opt/kafka/bin/kafka-producer-perf-test.sh \
           --topic "${TOPIC}" \
-          --num-records 10000000 \
+          --num-records 100000000 \
           --throughput "${RATE}" \
           --record-size "${RECORD_SIZE}" \
-          --producer-props acks=1 bootstrap.servers="${BROKER}" &
-
-        sleep 10
-
-        RATE=$((RATE * 2))
-
-        if [ "$RATE" -gt 64000 ]; then
-          echo "Max rate reached, stopping breakdown"
-          break
-        fi
-      done
-
-      exit 0
-    fi
+          --producer-props acks=1 bootstrap.servers="${BROKER}"
+    
+      RATE=$((RATE * 2))
+    done
 
     ########################################
     # ELSE: DEFAULT 
