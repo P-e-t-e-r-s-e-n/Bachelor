@@ -23,23 +23,22 @@ data:
     echo "Topic: ${TOPIC}"
 
     ########################################
-    # BREAKDOWN SCENARIO (SEQUENTIAL RAMP)
+    # BREAKDOWN SCENARIO (ONE PRODUCER)
     ########################################
     if [ "$SCENARIO" = "breakdown" ]; then
-      echo "Running BREAKDOWN scenario (sequential ramp)"
+      echo "Running BREAKDOWN scenario (single producer, restart each step)"
     
       RATE=1000
       MAX_RATE=64000
-      MULTIPLIER=1.25   # exponentiell (1.2–1.5 ist ideal)
-      DURATION=20       # seconds per step
+      STEP_TIME=20
     
-      while (( $(echo "$RATE <= $MAX_RATE" | bc -l) ))
+      while [ "$RATE" -le "$MAX_RATE" ]
       do
         echo "========================================"
-        echo "Running step with RATE=$RATE msg/s"
-        echo "Duration: ${DURATION}s"
+        echo "Starting run with RATE=$RATE msg/s for ${STEP_TIME}s"
         echo "========================================"
     
+        timeout ${STEP_TIME} \
         /opt/kafka/bin/kafka-producer-perf-test.sh \
           --topic "${TOPIC}" \
           --num-records 100000000 \
@@ -47,12 +46,10 @@ data:
           --record-size "${RECORD_SIZE}" \
           --producer-props acks=1 bootstrap.servers="${BROKER}"
     
-        echo "Finished step RATE=$RATE"
-        echo ""
+        echo "Finished run RATE=$RATE"
+        echo "----------------------------------------"
     
-        # exponentieller Anstieg
-        RATE=$(echo "$RATE * $MULTIPLIER" | bc -l)
-        RATE=${RATE%.*}
+        RATE=$((RATE * 2))
       done
     
       echo "Breakdown finished"
