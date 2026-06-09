@@ -1,0 +1,18 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: kafka-memory-stress
+  namespace: kafka
+spec:
+  mode: fixed
+  value: '1'
+  selector:
+    namespaces:
+      - kafka
+    labelSelectors:
+      'strimzi.io/kind': 'stu245087-kafka-cluster-kafka'
+  stressors:
+    memory:
+      workers: 4
+      size: '256Mi' # Reserviert zusätzlich 256MB RAM im Pod
+  duration: '60s'

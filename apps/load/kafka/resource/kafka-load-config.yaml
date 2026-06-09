@@ -22,7 +22,7 @@ data:
     echo "Broker: ${BROKER}"
     echo "Topic: ${TOPIC}"
     ########################################
-    # BREAKDOWN SCENARIO (Syntax Fix)
+    # BREAKDOWN SCENARIO 
     ########################################
     if [ "$SCENARIO" = "breakdown" ]; then
         echo "Running BREAKDOWN scenario"
@@ -35,8 +35,7 @@ data:
             
             echo "Current throughput: $RATE msg/s (Running for ${SECONDS_PER_STEP}s, Total Records: ${COMPUTED_RECORDS})"
             
-            # FIX: --bootstrap-server explizit nutzen!
-            # Zusätzliche Properties werden per --producer-props (bzw. --command-property) übergeben
+  
             /opt/kafka/bin/kafka-producer-perf-test.sh \
               --topic "${TOPIC}" \
               --num-records "${COMPUTED_RECORDS}" \
