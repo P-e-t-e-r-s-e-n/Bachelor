@@ -22,30 +22,28 @@ data:
     echo "Broker: ${BROKER}"
     echo "Topic: ${TOPIC}"
     ########################################
-    # BREAKDOWN SCENARIO (Korrigiert)
+    # BREAKDOWN SCENARIO (Syntax Fix)
     ########################################
     if [ "$SCENARIO" = "breakdown" ]; then
         echo "Running BREAKDOWN scenario"
         RATE=1000
-        SECONDS_PER_STEP=40 # Wie lange jede Stufe laufen soll (wichtig für Prometheus!)
+        SECONDS_PER_STEP=40
         
         while true
         do
-            # Berechne die Anzahl der Records, um die Zeit zu füllen
-            # z.B. bei 1000 msg/s * 40s = 40000 Records
             COMPUTED_RECORDS=$((RATE * SECONDS_PER_STEP))
             
             echo "Current throughput: $RATE msg/s (Running for ${SECONDS_PER_STEP}s, Total Records: ${COMPUTED_RECORDS})"
             
-            # WICHTIG: KEIN '&' am Ende, damit die Stufen nacheinander laufen.
-            # --producer-props wurde durch --command-property ersetzt, um die Warnung zu entfernen.
+            # FIX: --bootstrap-server explizit nutzen!
+            # Zusätzliche Properties werden per --producer-props (bzw. --command-property) übergeben
             /opt/kafka/bin/kafka-producer-perf-test.sh \
               --topic "${TOPIC}" \
               --num-records "${COMPUTED_RECORDS}" \
               --throughput "${RATE}" \
               --record-size "${RECORD_SIZE}" \
-              --command-property bootstrap.servers="${BROKER}" \
-              --command-property acks=1
+              --bootstrap-server "${BROKER}" \
+              --producer-props acks=1
               
             echo "Step with $RATE msg/s finished. Waiting 5s before next step..."
             sleep 5 
