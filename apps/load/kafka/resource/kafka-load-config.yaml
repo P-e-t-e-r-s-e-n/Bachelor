@@ -26,24 +26,40 @@ data:
     # BREAKDOWN SCENARIO
     ########################################
     if [ "$SCENARIO" = "breakdown" ]; then
-      echo "Running BREAKDOWN scenario"
-
-      RATE=1000
-
+    echo "Running BREAKDOWN scenario (continuous ramp)"
+  
+    RATE=1000
+    STEP=200
+    INTERVAL=10   # seconds per measurement window
+  
     while [ "$RATE" -le 64000 ]
     do
-      echo "Rate=$RATE"
-    
-      timeout 10 \
+      echo "Current target rate: $RATE msg/s"
+  
       /opt/kafka/bin/kafka-producer-perf-test.sh \
-          --topic "${TOPIC}" \
-          --num-records 100000000 \
-          --throughput "${RATE}" \
-          --record-size "${RECORD_SIZE}" \
-          --producer-props acks=1 bootstrap.servers="${BROKER}"
-    
-      RATE=$((RATE * 2))
+        --topic "${TOPIC}" \
+        --num-records 100000000 \
+        --throughput "${RATE}" \
+        --record-size "${RECORD_SIZE}" \
+        --producer-props acks=1 bootstrap.servers="${BROKER}" \
+        > /tmp/breakdown.log 2>&1 &
+  
+      PID=$!
+  
+      sleep $INTERVAL
+  
+      kill $PID 2>/dev/null || true
+  
+      # smooth ramp (wichtig für "kontinuierlich")
+      RATE=$((RATE * 110 / 100))  # +10% every step
+  
+      # optional: steiler machen wenn du schneller crash willst
+      # STEP=$((STEP + 100))
     done
+  
+    echo "Breakdown finished"
+    exit 0
+  fi
 
     ########################################
     # ELSE: DEFAULT 
