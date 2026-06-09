@@ -10,5 +10,5 @@ spec:
     namespaces:
       - kafka
     labelSelectors:
-      app: kafka
+      strimzi.io/component-type: kafka
   duration: "30s"
