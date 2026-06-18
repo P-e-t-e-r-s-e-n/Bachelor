@@ -10,7 +10,9 @@ spec:
     chart: chaos-mesh
     targetRevision: 2.8.2
     helm:
-      values: ""
+      values: |
+        chaosDaemon:
+          runtime: containerd
   destination:
     server: https://kubernetes.default.svc
     namespace: chaos
