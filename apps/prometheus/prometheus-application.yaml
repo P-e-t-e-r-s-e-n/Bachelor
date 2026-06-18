@@ -26,6 +26,7 @@ spec:
           prometheusSpec:
             serviceMonitorSelectorNilUsesHelmValues: false
             podMonitorSelectorNilUsesHelmValues: false
+            scrapeInterval: 1s
         grafana:
           enabled: false
         defaultRules:
