@@ -13,6 +13,7 @@ spec:
       values: |
         chaosDaemon:
           runtime: containerd
+          socketPath=/run/containerd/containerd.sock
   destination:
     server: https://kubernetes.default.svc
     namespace: chaos
