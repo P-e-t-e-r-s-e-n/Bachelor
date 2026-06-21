@@ -16,6 +16,7 @@ data:
     THROUGHPUT="${THROUGHPUT:--1}"
     RECORD_SIZE="${RECORD_SIZE:-1024}"
     NUM_RECORDS="${NUM_RECORDS:-10000000}"
+    COMPRESSION_TYPE="${COMPRESSION_TYPE:-none}"
 
     echo "Starting Kafka load test"
     echo "Scenario: ${SCENARIO}"
@@ -37,12 +38,14 @@ data:
             
   
             /opt/kafka/bin/kafka-producer-perf-test.sh \
-              --topic "${TOPIC}" \
-              --num-records "${COMPUTED_RECORDS}" \
-              --throughput "${RATE}" \
-              --record-size "${RECORD_SIZE}" \
-              --bootstrap-server "${BROKER}" \
-              --producer-props acks=1
+            --topic "${TOPIC}" \
+            --num-records "${NUM_RECORDS}" \
+            --throughput "${THROUGHPUT}" \
+            --record-size "${RECORD_SIZE}" \
+            --producer-props \
+                acks=1 \
+                bootstrap.servers="${BROKER}" \
+                compression.type="${COMPRESSION_TYPE}"
               
             echo "Step with $RATE msg/s finished. Waiting 5s before next step..."
             sleep 5 
@@ -64,4 +67,7 @@ data:
       --num-records "${NUM_RECORDS}" \
       --throughput "${THROUGHPUT}" \
       --record-size "${RECORD_SIZE}" \
-      --producer-props acks=1 bootstrap.servers="${BROKER}"
+      --producer-props \
+          acks=1 \
+          bootstrap.servers="${BROKER}" \
+          compression.type="${COMPRESSION_TYPE}"
