@@ -69,3 +69,5 @@ data:
       --producer-props \
           acks=1 \
           bootstrap.servers="${BROKER}" \
+          batch.size=0 \
+          linger.ms=0 \
