@@ -71,3 +71,4 @@ data:
           bootstrap.servers="${BROKER}" \
           batch.size=0 \
           linger.ms=0 \
+    sleep 30
